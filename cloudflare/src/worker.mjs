@@ -232,7 +232,7 @@ function decodeCursor(cursor) {
   try {
     fail(typeof cursor === 'string' && cursor.length <= 8192, '分页游标无效');
     const raw = cursor.replaceAll('-', '+').replaceAll('_', '/');
-    const tuple = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(atob(raw), c => c.charCodeAt(0))));
+    const tuple = JSON.parse(new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(Uint8Array.from(atob(raw), c => c.charCodeAt(0))));
     fail(Array.isArray(tuple), '分页游标无效');
     return tuple;
   } catch { throw new ApiError(400, '分页游标无效'); }
