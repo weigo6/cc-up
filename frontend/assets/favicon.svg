@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CC-Up">
+  <!-- Same mark as the page header logo: 2x2 grid of 12px rounded tiles,
+       3px gap, rotated -13deg (.brand-mark in assets/styles.css). -->
+  <g transform="rotate(-13 32 32)">
+    <rect x="9.5" y="9.5" width="20" height="20" rx="5" fill="#6e91e6"/>
+    <rect x="34.5" y="9.5" width="20" height="20" rx="5" fill="#6fbda9"/>
+    <rect x="9.5" y="34.5" width="20" height="20" rx="5" fill="#e7b357"/>
+    <rect x="34.5" y="34.5" width="20" height="20" rx="5" fill="#a184d7"/>
+  </g>
+</svg>

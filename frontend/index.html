@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#faf9f5">
+  <meta name="description" content="CC-Up：查看多设备 Agent 用量、Token 热力图、费用和请求日志。">
+  <title>CC-Up · 用量工作台</title>
+  <link rel="icon" href="./assets/favicon.svg?v=0.3.0" type="image/svg+xml" sizes="any">
+  <link rel="stylesheet" href="./assets/styles.css?v=0.3.0">
+  <script type="module" src="./assets/app.mjs?v=0.3.0"></script>
+</head>
+<body>
+  <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 5h13M8 12h13M8 19h13M3 5h.01M3 12h.01M3 19h.01"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 7v5l3 2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="m9.2 3-.6 2.2-2 .9-2.1-.6-2 3.4L4 10.5v2.9l-1.5 1.7 2 3.4 2.1-.6 2 .9.6 2.2h4l.6-2.2 2-.9 2.1.6 2-3.4-1.5-1.7v-2.9l1.5-1.6-2-3.4-2.1.6-2-.9-.6-2.2z"/><circle cx="11.2" cy="12" r="3"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5.1 7a8 8 0 0 1 13-2L20 7M4 17l1.9 2a8 8 0 0 0 13-2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m10 13 4-4M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 1 1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 0)"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M2 12h5l3-8 4 16 3-8h5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-12 4h.01m4 0h.01m4 0h.01"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></symbol>
+  </defs></svg>
+
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="site-header">
+    <a class="brand" href="#overview" aria-label="CC-Up 首页"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>CC-UP<small>Agent Usage</small></span></a>
+    <div class="topbar-right"><span class="connection-pill demo" id="connectionState"><i></i>演示模式</span><button class="icon-button theme-button" id="themeButton" aria-label="切换深色主题"><svg class="icon"><use href="#i-moon"/></svg></button><button class="button" id="connectButton"><svg class="icon"><use href="#i-link"/></svg><span>连接我的数据</span></button></div>
+  </header>
+  <nav class="navigation-bar" aria-label="主要导航">
+    <div class="nav-links"><a href="#overview" class="nav-item active" data-view="overview"><svg class="icon"><use href="#i-grid"/></svg>用量概览</a><a href="#logs" class="nav-item" data-view="logs"><svg class="icon"><use href="#i-list"/></svg>请求日志<span class="nav-note">90 天</span></a><a href="#history" class="nav-item" data-view="history"><svg class="icon"><use href="#i-history"/></svg>历史用量</a><a href="#settings" class="nav-item" data-view="settings"><svg class="icon"><use href="#i-settings"/></svg>连接设置</a></div>
+    <span class="nav-caption">CC-Switch · 多设备统计</span>
+  </nav>
+  <div class="workspace">
+    <main id="main" tabindex="-1">
+      <div class="page-heading"><div><div class="eyebrow">AGENT USAGE</div><h1 id="pageTitle">用量概览</h1><p id="pageDescription">汇总每台设备的请求、Token 与费用。</p></div><div class="heading-actions"><span class="updated-label" id="updatedLabel">示例数据 · 未连接真实设备</span><button class="button" id="refreshButton"><svg class="icon"><use href="#i-refresh"/></svg>刷新</button></div></div>
+      <div class="notice demo-notice" id="demoNotice"><svg class="icon"><use href="#i-info"/></svg><span>正在浏览示例数据。连接你的 Worker，查看真实用量。</span><button class="text-button" id="demoConnect">现在连接 <span>↗</span></button></div>
+      <div class="notice warning" id="warningNotice" role="status" hidden></div>
+      <div class="notice error" id="errorNotice" role="alert" hidden></div>
+
+      <section class="filterbar" id="filterbar" aria-label="筛选条件"><div class="filter-select"><svg class="icon"><use href="#i-monitor"/></svg><select id="deviceFilter" aria-label="筛选设备"><option value="">全部设备</option></select></div><div class="filter-select"><svg class="icon"><use href="#i-grid"/></svg><select id="appFilter" aria-label="筛选应用"><option value="">全部应用</option></select></div><div class="filter-spacer"></div><div class="range-shortcuts" role="group" aria-label="时间范围"><button data-range="all" class="range-button">全部</button><button data-range="7" class="range-button">7 天</button><button data-range="30" class="range-button active">30 天</button><button data-range="90" class="range-button">90 天</button></div><div class="date-range"><input type="date" id="startDate" aria-label="开始日期"><span>—</span><input type="date" id="endDate" aria-label="结束日期"><button class="icon-button" id="applyRange" aria-label="应用日期范围"><svg class="icon"><use href="#i-arrow"/></svg></button></div></section>
+
+      <section id="view-overview" class="view">
+        <div class="metrics-grid">
+          <article class="metric-card featured"><div class="metric-label"><span>真实消耗 Token</span><span class="metric-icon"><svg class="icon"><use href="#i-activity"/></svg></span></div><div class="metric-value" id="metricTokens">—</div><div class="metric-meta" id="tokenMeta">新增输入 + 输出 + 缓存读取 + 缓存写入</div><svg class="metric-spark" preserveAspectRatio="none" id="metricSpark" viewBox="0 0 130 35" aria-hidden="true"></svg></article>
+          <article class="metric-card"><div class="metric-label"><span>请求次数</span><span class="metric-icon"><svg class="icon"><use href="#i-list"/></svg></span></div><div class="metric-value" id="metricRequests">—</div><div class="metric-meta" id="requestMeta">按本地去重口径汇总</div><svg class="metric-spark" preserveAspectRatio="none" id="requestSpark" viewBox="0 0 130 35" aria-hidden="true"></svg></article>
+          <article class="metric-card"><div class="metric-label"><span>估算费用</span><span class="metric-unit">USD</span></div><div class="metric-value" id="metricCost">—</div><div class="metric-meta">沿用 CC-Switch 已计算的费用</div><svg class="metric-spark" preserveAspectRatio="none" id="costSpark" viewBox="0 0 130 35" aria-hidden="true"></svg></article>
+          <article class="metric-card"><div class="metric-label"><span>缓存命中率</span><svg class="icon info-icon"><use href="#i-info"/></svg></div><div class="metric-value" id="metricCache">—</div><div class="metric-meta" id="cacheMeta">缓存读取占全部输入的比例</div><svg class="metric-spark" preserveAspectRatio="none" id="cacheSpark" viewBox="0 0 130 35" aria-hidden="true"></svg></article>
+        </div>
+
+        <div class="analysis-grid"><section class="card trend-card"><div class="card-heading"><div><h2>用量趋势</h2><p id="trendDescription">每天的投入，都在这里留下轨迹。</p></div><select class="compact-select" id="trendMetric" aria-label="趋势指标"><option value="real_total">Token 消耗</option><option value="requests">请求次数</option><option value="cost_usd">估算费用</option></select></div><div class="trend-chart" id="trendChart" aria-label="每日用量趋势"></div><div class="chart-footnote"><span><i class="legend-dot"></i> 已上报的日用量</span><span id="chartPeak">—</span></div></section>
+        <section class="card app-card"><div class="card-heading"><div><h2>应用分布</h2><p>看看用量花在哪里</p></div><span class="subtle-tag">Token</span></div><div id="appBreakdown" class="app-breakdown"></div><div class="token-composition" id="tokenComposition"></div></section></div>
+
+        <section class="card heatmap-card"><div class="card-heading"><div><h2>用量热力图 <span class="heading-small" id="heatmapActive">—</span></h2><p>一格一天，长期留存每一天的使用记录。</p></div><div class="heatmap-controls"><select class="compact-select" id="heatmapMetric" aria-label="热力图指标"><option value="real_total">真实消耗 Token</option><option value="requests">请求次数</option><option value="cost_usd">估算费用</option><option value="fresh_input">新增输入</option><option value="output">输出 Token</option><option value="cache_read">缓存读取</option><option value="cache_write">缓存写入</option></select><select class="compact-select" id="heatmapYear" aria-label="热力图年份"></select></div></div><div class="heatmap-scroll"><div class="heatmap-layout"><div class="heatmap-weekdays" aria-hidden="true"><span>一</span><span></span><span>三</span><span></span><span>五</span><span></span><span>日</span></div><div class="heatmap-main"><div class="heatmap-months" id="heatmapMonths" aria-hidden="true"></div><div class="heatmap-grid" id="heatmapGrid" role="group" aria-label="每日用量热力图"></div></div></div></div><div class="heatmap-footer"><span id="heatmapSummary">按日用量长期保存，不受请求日志保留期影响。</span><div class="heatmap-legend"><span class="no-data-sample"></span><span>未上报</span><span class="legend-gap">少</span><i data-level="0"></i><i data-level="1"></i><i data-level="2"></i><i data-level="3"></i><i data-level="4"></i><span>多</span></div></div></section>
+
+        <section class="card device-card"><div class="card-heading"><div><h2>设备一览</h2><p>各自工作，一起汇总。</p></div><span class="subtle-tag" id="deviceCount">—</span></div><div class="device-grid" id="deviceCards"></div></section>
+      </section>
+
+      <section id="view-logs" class="view" hidden><section class="card table-card"><div class="card-heading"><div><h2>请求日志</h2><p>查看最近 90 天的原始请求记录。</p></div><button class="button" id="exportLogs"><svg class="icon"><use href="#i-download"/></svg>导出本页</button></div><form class="log-search" id="logSearch"><div class="search-input"><svg class="icon"><use href="#i-search"/></svg><input id="logQuery" type="search" maxlength="200" placeholder="搜索模型、请求 ID、会话或供应商" aria-label="搜索请求日志"></div><select id="logStatus" aria-label="筛选状态"><option value="">全部状态</option><option value="2xx">成功 · 2xx</option><option value="4xx">请求错误 · 4xx</option><option value="5xx">服务错误 · 5xx</option><option value="429">限流 · 429</option></select><button class="button button-primary" type="submit">查询</button></form><div class="table-scroll"><table><thead><tr><th>请求时间</th><th>应用 / 模型</th><th>设备</th><th>状态</th><th class="numeric">Token</th><th class="numeric">费用</th><th class="numeric">耗时</th><th></th></tr></thead><tbody id="logRows"></tbody></table></div><div class="table-footer"><span id="logPageInfo">—</span><div class="pagination"><button class="button" id="logPrevious">上一页</button><button class="button" id="logNext">下一页 <svg class="icon"><use href="#i-chevron"/></svg></button></div></div><p class="table-note">原始日志保留采集时的字段值；用量概览采用本地去重结果，两者不保证逐条对账。</p></section></section>
+
+      <section id="view-history" class="view" hidden><section class="card table-card"><div class="card-heading"><div><h2>每日用量</h2><p>所选范围内按日期汇总的持久化记录。</p></div><button class="button" id="exportHistory"><svg class="icon"><use href="#i-download"/></svg>导出 CSV</button></div><div class="table-scroll"><table><thead><tr><th>日期</th><th class="numeric">请求数</th><th class="numeric">新增输入</th><th class="numeric">输出</th><th class="numeric">缓存读取</th><th class="numeric">缓存写入</th><th class="numeric">真实消耗</th><th class="numeric">费用</th><th></th></tr></thead><tbody id="historyRows"></tbody></table></div><div class="table-footer"><span id="historyPageInfo">—</span><div class="pagination"><button class="button" id="historyPrevious">上一页</button><button class="button" id="historyNext">下一页 <svg class="icon"><use href="#i-chevron"/></svg></button></div></div></section></section>
+
+      <section id="view-settings" class="view" hidden><section class="card settings-card"><div class="settings-illustration"><svg class="icon"><use href="#i-link"/></svg></div><h2>连接你的用量数据</h2><p>前端可部署在任意静态托管平台，数据通过你的 Worker 读取。</p><div class="settings-status" id="settingsStatus">当前正在浏览示例数据。</div><button class="button button-primary" id="settingsConnect">设置云端连接 <svg class="icon"><use href="#i-arrow"/></svg></button><button class="button" id="disconnectButton">切换为演示模式</button><div class="settings-notes"><h3>开始之前</h3><ol><li>部署项目中的 Cloudflare Worker，并完成采集器首次同步。</li><li>将当前网页来源加入 Worker 的 <code>ALLOWED_ORIGINS</code>。</li><li>网页与两台电脑填写同一份 Worker 地址和同步密钥。</li></ol><p>密钥不会写入网页源码。默认只在当前页面内存中使用；勾选“记住本次会话”后，仅保留在当前标签页的会话存储中。</p></div></section></section>
+      <footer class="page-footer"><span>数据聚合于 CC-Up <span class="footer-separator">·</span> 本地计算，云端留存</span><span id="footerRange">默认统计时区 UTC+8</span></footer>
+    </main>
+  </div>
+
+  <dialog id="connectionDialog" class="dialog connection-dialog"><form id="connectForm"><div class="dialog-heading"><div><div class="eyebrow">CONNECT YOUR WORKSPACE</div><h2>连接云端数据</h2></div><button class="icon-button" type="button" data-close="connectionDialog" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><p class="dialog-description">填写你的 Worker 地址与同步密钥，数据直接从你的云端读取。</p><label class="field-label" for="endpointInput">Worker 地址</label><input class="text-input" id="endpointInput" type="url" placeholder="https://cc-up.example.workers.dev" required autocomplete="url"><label class="field-label" for="tokenInput">同步密钥</label><input class="text-input" id="tokenInput" type="password" placeholder="与采集器使用同一个 SYNC_TOKEN" required autocomplete="off" spellcheck="false"><label class="checkbox-label"><input type="checkbox" id="rememberSession">记住本次会话</label><div class="notice error" id="connectionError" role="alert" hidden></div><div class="dialog-actions"><button class="button" type="button" data-close="connectionDialog">取消</button><button class="button button-primary" type="submit" id="submitConnect">连接并读取 <svg class="icon"><use href="#i-arrow"/></svg></button></div></form></dialog>
+  <dialog id="detailDialog" class="dialog detail-dialog"><div class="dialog-heading"><div><div class="eyebrow" id="detailEyebrow">DAILY INSIGHTS</div><h2 id="detailTitle"></h2></div><button class="icon-button" data-close="detailDialog" aria-label="关闭详情"><svg class="icon"><use href="#i-close"/></svg></button></div><div id="detailContent"></div><div class="dialog-actions" id="detailActions"></div></dialog>
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><div class="noscript">请启用 JavaScript，以查看用量图表和查询数据。</div></noscript>
+</body>
+</html>

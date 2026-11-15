@@ -1,0 +1,10 @@
+# Netlify 部署配置：构建时把环境变量写成 frontend/config.json，网页即可免填写密钥。
+# 在 Netlify → Site configuration → Environment variables 里设置：
+#   CC_UP_ENDPOINT = https://cc-up.<子域>.workers.dev
+#   CC_UP_TOKEN    = Worker VIEWER_TOKENS 中的一把只读密钥
+# 生成的 config.json 对网站访问者公开，请勿使用采集器的 SYNC_TOKEN。
+# 未设置时构建照常通过，页面仍会要求手动填写密钥。
+
+[build]
+  publish = "frontend"
+  command = "node tools/build_web_config.mjs"

@@ -1,0 +1,9 @@
+[project]
+name = "cc-up"
+version = "0.3.0"
+description = "Low-memory CC-Switch usage collector for Windows and Cloudflare"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+cc-up = "cc_up.__main__:main"
