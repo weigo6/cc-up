@@ -4,6 +4,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -75,6 +76,11 @@ def main() -> int:
 
 
 if __name__ == '__main__':
+    # Windows CI redirects output and may otherwise select an ANSI code page.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
     try:
         raise SystemExit(main())
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
